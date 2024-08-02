@@ -29,7 +29,6 @@ class TextRecognitionBloc extends Bloc<TextRecognitionEvent, TextRecognitionStat
     on<UpdateTextFieldValue>(_onUpdateTextFieldValue);
     on<DownloadSpreadsheet>(_onDownloadSpreadsheet);
     on<SwitchToSheet2>(_onSwitchToSheet2);
-
   }
 
   Future<void> _onRecognizeTextFromCamera(RecognizeTextFromCamera event, Emitter<TextRecognitionState> emit) async {
@@ -127,6 +126,7 @@ class TextRecognitionBloc extends Bloc<TextRecognitionEvent, TextRecognitionStat
       extractedData: {},
     ));
   }
+
   void _onSwitchToSheet2(SwitchToSheet2 event, Emitter<TextRecognitionState> emit) {
     GoogleSheetsService.switchToSheet2();
     emit(state.copyWith(isSheet2: true));
@@ -141,15 +141,11 @@ class TextRecognitionBloc extends Bloc<TextRecognitionEvent, TextRecognitionStat
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
-      final bytes = await GoogleSheetsService.downloadSpreadsheet();
-      if (bytes != null) {
-        final directory = await getApplicationDocumentsDirectory();
-        final file = File('${directory.path}/spreadsheet.xlsx');
-        await file.writeAsBytes(bytes);
-
+      final filePath = await GoogleSheetsService.downloadSpreadsheet();
+      if (filePath != null) {
         emit(state.copyWith(
           isLoading: false,
-          error: 'Tablo başarıyla indirildi: ${file.path}',
+          error: 'Tablo başarıyla indirildi: $filePath',
         ));
       } else {
         emit(state.copyWith(
@@ -164,6 +160,7 @@ class TextRecognitionBloc extends Bloc<TextRecognitionEvent, TextRecognitionStat
       ));
     }
   }
+
   @override
   Future<void> close() {
     textRecognizer.close();

@@ -1,3 +1,4 @@
+import 'package:albayrakdc_control/permissions.dart';
 import 'package:albayrakdc_control/views/text_recognition_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +9,7 @@ import 'g_sheets_services.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GoogleSheetsService.init();
+  requestPermission();
   runApp(MyApp());
 }
 
