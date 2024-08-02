@@ -1,0 +1,41 @@
+name: albayrakdc_control
+description: "A new Flutter project."
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.4 <4.0.0'
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_ml_kit:
+  image_picker:
+  googleapis:
+  googleapis_auth:
+  path_provider:
+  gsheets:
+  camera:
+  permission_handler:
+  flutter_bloc:
+  equatable:
+  google_mlkit_text_recognition:
+  http:
+
+
+
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+
+
+  uses-material-design: true
+
