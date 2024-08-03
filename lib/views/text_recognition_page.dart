@@ -40,7 +40,7 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white, backgroundColor: AppTheme.primaryRed,
             ),
-          ) ;/*IconButton(
+          );/*IconButton(
             icon: Icon(
               state.isSheet2 ? Icons.filter_2 : Icons.filter_1,
               color: Colors.white,
@@ -122,7 +122,6 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
         Expanded(
           child: CustomActionButton(
             icon: Icons.camera_alt,
-            label: 'Kameradan\nTarat',
             onPressed: () => context.read<TextRecognitionBloc>().add(RecognizeTextFromCamera()),
           ),
         ),
@@ -130,7 +129,13 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
         Expanded(
           child: CustomActionButton(
             icon: Icons.photo_library,
-            label: 'Galeriden\nSeç',
+            onPressed: () => context.read<TextRecognitionBloc>().add(RecognizeTextFromGallery()),
+          ),
+        ),
+        SizedBox(width: 16),
+        Expanded(
+          child: CustomActionButton(
+            icon: Icons.qr_code_sharp,
             onPressed: () => context.read<TextRecognitionBloc>().add(RecognizeTextFromGallery()),
           ),
         ),
@@ -145,10 +150,14 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
         child: CustomTextField(
           label: entry.key,
           controller: entry.value,
+          keyboardtype: entry.key == 'KALITE'
+              ? TextInputType.text
+              : TextInputType.numberWithOptions(decimal: true),
         ),
       );
     }).toList();
   }
+
 
   void _uploadData(BuildContext context) {
     final updatedData = _controllers.map((key, controller) => MapEntry(key, controller.text));

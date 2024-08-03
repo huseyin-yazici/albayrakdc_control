@@ -7,15 +7,17 @@ import 'theme/app_theme.dart';
 import 'g_sheets_services.dart';
 
 Future<void> main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   await GoogleSheetsService.init();
-  requestPermission();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    requestStoragePermission(context);
+
     return MaterialApp(debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: BlocProvider(

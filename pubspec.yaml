@@ -19,13 +19,13 @@ dependencies:
   path_provider:
   gsheets:
   camera:
-  permission_handler:
+  permission_handler: ^11.3.1
   flutter_bloc:
   equatable:
   google_mlkit_text_recognition:
   http:
-
-
+  qr_code_scanner:
+  device_info_plus: ^10.1.1
 
   cupertino_icons: ^1.0.6
 
