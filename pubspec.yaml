@@ -16,7 +16,6 @@ dependencies:
   image_picker:
   googleapis:
   googleapis_auth:
-  path_provider:
   gsheets:
   camera:
   permission_handler: ^11.3.1
@@ -25,7 +24,6 @@ dependencies:
   google_mlkit_text_recognition:
   http:
   qr_code_scanner:
-  device_info_plus: ^10.1.1
 
   cupertino_icons: ^1.0.6
 

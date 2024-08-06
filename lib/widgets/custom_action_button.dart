@@ -27,7 +27,7 @@ class CustomActionButton extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 60, color: AppTheme.primaryRed),
+            Icon(icon, size: 70, color: AppTheme.primaryRed),
             SizedBox(height: 8),
 
           ],

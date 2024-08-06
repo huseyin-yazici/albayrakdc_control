@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import '../bloc/text_recognition_bloc.dart';
 import '../bloc/text_recognition_event.dart';
 import '../bloc/text_recognition_state.dart';
@@ -14,6 +15,8 @@ class TextRecognitionScreen extends StatefulWidget {
 }
 
 class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
+  final TextRecognizer _textRecognizer = TextRecognizer();
+  String _recognizedText = '';
   final Map<String, TextEditingController> _controllers = {
     'ETIKET': TextEditingController(),
     'EBAT': TextEditingController(),
@@ -22,6 +25,14 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
     'AGIRLIK': TextEditingController(),
     'PAKET': TextEditingController(),
   };
+
+  void _printRecognizedText() {
+    print('--- Recognized Text ---');
+    _controllers.forEach((key, controller) {
+      print('$key: ${controller.text}');
+    });
+    print('----------------------');
+  }
 
   @override
   void dispose() {
@@ -32,15 +43,20 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(actions: [BlocBuilder<TextRecognitionBloc, TextRecognitionState>(
-        builder: (context, state) {
-          return  ElevatedButton(
-            onPressed: () => context.read<TextRecognitionBloc>().add(DownloadSpreadsheet()),
-            child: Text('Tabloyu İndir'),
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.white, backgroundColor: AppTheme.primaryRed,
-            ),
-          );/*IconButton(
+      appBar: AppBar(
+        actions: [
+          BlocBuilder<TextRecognitionBloc, TextRecognitionState>(
+            builder: (context, state) {
+              return IconButton(
+                icon: state.isClearingSheets
+                    ? CircularProgressIndicator(color: Colors.white)
+                    : Icon(Icons.refresh, color: Colors.white),
+                onPressed: state.isClearingSheets
+                    ? null
+                    : () {
+                  context.read<TextRecognitionBloc>().add(ClearGoogleSheetsRange());
+                },
+              ); /*IconButton(
             icon: Icon(
               state.isSheet2 ? Icons.filter_2 : Icons.filter_1,
               color: Colors.white,
@@ -61,8 +77,9 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
               padding: EdgeInsets.all(12),
             ),
           );*/
-        },
-      ),],
+            },
+          ),
+        ],
         centerTitle: true,
         title: Text('Albayrak DC Firmaşin Kabul Kontrol'),
       ),
@@ -72,6 +89,8 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
             state.extractedData.forEach((key, value) {
               _controllers[key]?.text = value;
             });
+            // Tanıma işlemi tamamlandığında PrintRecognizedText event'ini tetikle
+            context.read<TextRecognitionBloc>().add(PrintRecognizedText());
           } else {
             _controllers.forEach((key, controller) => controller.clear());
           }
@@ -86,7 +105,9 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
                   value: state.selectedNumber,
                   onChanged: (int? newValue) {
                     if (newValue != null) {
-                      context.read<TextRecognitionBloc>().add(UpdateSelectedNumber(newValue));
+                      context
+                          .read<TextRecognitionBloc>()
+                          .add(UpdateSelectedNumber(newValue));
                     }
                   },
                 ),
@@ -98,13 +119,16 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
                 else if (state.error != null)
                   Text(state.error!, style: TextStyle(color: Colors.red))
                 else if (state.error != null)
-                    Text(state.error!, style: TextStyle(color: Colors.green)),
+                  Text(state.error!, style: TextStyle(color: Colors.green)),
                 ..._buildTextFields(),
                 SizedBox(height: 16),
                 if (state.isDataRecognized)
                   ElevatedButton(
                     onPressed: () => _uploadData(context),
-                    child: Text('Google Sheets\'e Kaydet',style: TextStyle(color: Colors.white),),
+                    child: Text(
+                      'Google Sheets\'e Kaydet',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
               ],
             ),
@@ -114,31 +138,27 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
     );
   }
 
-
-
   Widget _buildActionButtons(BuildContext context) {
     return Row(
       children: [
         Expanded(
           child: CustomActionButton(
-            icon: Icons.camera_alt,
-            onPressed: () => context.read<TextRecognitionBloc>().add(RecognizeTextFromCamera()),
-          ),
-        ),
-        SizedBox(width: 16),
-        Expanded(
-          child: CustomActionButton(
             icon: Icons.photo_library,
-            onPressed: () => context.read<TextRecognitionBloc>().add(RecognizeTextFromGallery()),
+            onPressed: () => context
+                .read<TextRecognitionBloc>()
+                .add(RecognizeTextFromGallery()),
           ),
         ),
         SizedBox(width: 16),
         Expanded(
           child: CustomActionButton(
-            icon: Icons.qr_code_sharp,
-            onPressed: () => context.read<TextRecognitionBloc>().add(RecognizeTextFromGallery()),
+            icon: Icons.camera_alt,
+            onPressed: () => context
+                .read<TextRecognitionBloc>()
+                .add(RecognizeTextFromCamera()),
           ),
         ),
+
       ],
     );
   }
@@ -158,9 +178,9 @@ class _TextRecognitionScreenState extends State<TextRecognitionScreen> {
     }).toList();
   }
 
-
   void _uploadData(BuildContext context) {
-    final updatedData = _controllers.map((key, controller) => MapEntry(key, controller.text));
+    final updatedData =
+        _controllers.map((key, controller) => MapEntry(key, controller.text));
     context.read<TextRecognitionBloc>().add(UploadToGoogleSheets(updatedData));
   }
 }

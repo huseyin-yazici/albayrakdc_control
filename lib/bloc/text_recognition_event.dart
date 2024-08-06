@@ -20,5 +20,10 @@ class UploadToGoogleSheets extends TextRecognitionEvent {
   final Map<String, String> data;
   UploadToGoogleSheets(this.data);
 }
+class PrintRecognizedText extends TextRecognitionEvent {}
+class ClearGoogleSheetsRange extends TextRecognitionEvent {}
+
+
+
 class DownloadSpreadsheet extends TextRecognitionEvent {}
 class IncrementSelectedNumber extends TextRecognitionEvent {}

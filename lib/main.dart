@@ -1,4 +1,3 @@
-import 'package:albayrakdc_control/permissions.dart';
 import 'package:albayrakdc_control/views/text_recognition_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,7 +15,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    requestStoragePermission(context);
 
     return MaterialApp(debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,

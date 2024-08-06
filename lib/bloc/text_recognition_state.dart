@@ -11,12 +11,9 @@ class TextRecognitionState {
   final bool isSheet2;
   final bool isSuccess;
 
-
-
-
+  final bool isClearingSheets;
 
   TextRecognitionState({
-
     this.recognizedText = '',
     this.extractedData = const {
       'EBAT': '',
@@ -32,27 +29,23 @@ class TextRecognitionState {
     this.useSheet2 = false,
     this.isSheet2 = false,
     this.isSuccess = false,
-
-
-
-
-
+    this.isClearingSheets = false,
   });
 
-
   TextRecognitionState copyWith({
+    bool? isClearingSheets,
     String? recognizedText,
     Map<String, String>? extractedData,
     bool? isLoading,
     String? error,
-    int? selectedNumber,  bool? isDataRecognized,
+    int? selectedNumber,
+    bool? isDataRecognized,
     bool? useSheet2,
     bool? isSheet2,
     bool? isSuccess,
-
-
   }) {
     return TextRecognitionState(
+      isClearingSheets: isClearingSheets ?? this.isClearingSheets,
       selectedNumber: selectedNumber ?? this.selectedNumber,
       recognizedText: recognizedText ?? this.recognizedText,
       extractedData: extractedData ?? this.extractedData,
@@ -62,9 +55,6 @@ class TextRecognitionState {
       useSheet2: useSheet2 ?? this.useSheet2,
       isSheet2: isSheet2 ?? this.isSheet2,
       isSuccess: isSuccess ?? this.isSuccess,
-
-
-
     );
   }
 }
