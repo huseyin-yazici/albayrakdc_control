@@ -24,8 +24,11 @@ dependencies:
   equatable:
   google_mlkit_text_recognition:
   http:
-  qr_code_scanner:
   device_info_plus: ^10.1.1
+  qr_code_scanner: ^1.0.1
+  mobile_scanner: ^3.0.0
+
+
 
   cupertino_icons: ^1.0.6
 

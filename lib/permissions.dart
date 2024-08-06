@@ -8,7 +8,6 @@ Future<void> requestStoragePermission(BuildContext context) async {
     if (await Permission.storage.request().isGranted) {
       print('Depolama izni verildi.');
     } else if (await Permission.storage.isPermanentlyDenied) {
-      // İzin kalıcı olarak reddedilmişse, kullanıcıyı ayarlara yönlendirin
       showDialog(
         context: context,
         builder: (context) => AlertDialog(

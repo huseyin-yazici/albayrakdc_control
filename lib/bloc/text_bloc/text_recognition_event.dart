@@ -22,3 +22,17 @@ class UploadToGoogleSheets extends TextRecognitionEvent {
 }
 class DownloadSpreadsheet extends TextRecognitionEvent {}
 class IncrementSelectedNumber extends TextRecognitionEvent {}
+class UpdateTextFieldQrValue extends TextRecognitionEvent {
+  final Map<String, String> qrData;
+
+  UpdateTextFieldQrValue(this.qrData);
+}
+class RecognizeQRFromImage extends TextRecognitionEvent {}
+
+class ScanQRCode extends TextRecognitionEvent {}
+class UpdateQRData extends TextRecognitionEvent {
+  final Map<String, String> data;
+
+  UpdateQRData(this.data);
+}
+class UploadSuccessful extends TextRecognitionEvent {}
