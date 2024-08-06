@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
+<<<<<<< HEAD:lib/bloc/text_recognition_bloc.dart
 import 'package:albayrakdc_control/bloc/text_recognition_event.dart';
 import 'package:albayrakdc_control/bloc/text_recognition_state.dart';
 import '../controller/wire_rod_field_controller.dart';
@@ -9,6 +10,15 @@ import '../g_sheets_services.dart';
 
 class TextRecognitionBloc
     extends Bloc<TextRecognitionEvent, TextRecognitionState> {
+=======
+import 'package:albayrakdc_control/bloc/text_bloc/text_recognition_state.dart';
+import '../../g_sheets_services.dart';
+import 'text_recognition_event.dart';
+
+class TextRecognitionBloc extends Bloc<TextRecognitionEvent, TextRecognitionState> {
+  String? _field;
+  String? _value;
+>>>>>>> b5962d1ba88232bdd366b8c5768e2d30f7f7a26b:lib/bloc/text_bloc/text_recognition_bloc.dart
   final textRecognizer = GoogleMlKit.vision.textRecognizer();
   final imagePicker = ImagePicker();
   final controllers = WireRodControllers.controllers;
@@ -16,14 +26,45 @@ class TextRecognitionBloc
   TextRecognitionBloc() : super(TextRecognitionState()) {
     on<RecognizeTextFromCamera>(_onRecognizeTextFromCamera);
     on<RecognizeTextFromGallery>(_onRecognizeTextFromGallery);
-    on<UploadToGoogleSheets>(_onUploadToGoogleSheets);
     on<UpdateSelectedNumber>(_onUpdateSelectedNumber);
     on<IncrementSelectedNumber>(_onIncrementSelectedNumber);
     on<UpdateTextFieldValue>(_onUpdateTextFieldValue);
     /* on<DownloadSpreadsheet>(_onDownloadSpreadsheet);*/
     on<SwitchToSheet2>(_onSwitchToSheet2);
+<<<<<<< HEAD:lib/bloc/text_recognition_bloc.dart
     on<PrintRecognizedText>(_onPrintRecognizedText);
     on<ClearGoogleSheetsRange>(_onClearGoogleSheetsRange); // Yeni eklenen satır
+=======
+    on<UpdateTextFieldQrValue>(_onUpdateTextFieldQrValue);
+    on<RecognizeQRFromImage>(_onRecognizeQRFromImage);
+    on<UploadToGoogleSheets>((event, emit) async {
+      emit(state.copyWith(isLoading: true, error: null));
+
+      try {
+        await GoogleSheetsService.insertData(event.data, state.selectedNumber);
+        emit(state.copyWith(
+          isLoading: false,
+          error: null,
+          isDataRecognized: false,
+          extractedData: {},
+        ));
+        add(UploadSuccessful());
+      } catch (e) {
+        emit(state.copyWith(
+          isLoading: false,
+          error: 'Veri yüklenirken bir hata oluştu: $e',
+        ));
+      }
+    });
+
+    on<UploadSuccessful>((event, emit) {
+      emit(state.copyWith(
+        isDataRecognized: false,
+        extractedData: {},
+      ));
+    });
+
+>>>>>>> b5962d1ba88232bdd366b8c5768e2d30f7f7a26b:lib/bloc/text_bloc/text_recognition_bloc.dart
 
   }
 
@@ -84,6 +125,10 @@ class TextRecognitionBloc
         isClearingSheets: false,
       ));
     }
+  }
+  void setFieldAndValue(String field, String value) {
+    this._field = field;
+    this._value = value;
   }
 
 // Bu fonksiyon, tanınmış metinleri analiz eder ve belirli anahtar kelimeleri içeren bir harita döndürür.
@@ -213,8 +258,13 @@ class TextRecognitionBloc
     ));
   }
 
+<<<<<<< HEAD:lib/bloc/text_recognition_bloc.dart
   Future<void> _onUploadToGoogleSheets(
       UploadToGoogleSheets event, Emitter<TextRecognitionState> emit) async {
+=======
+
+  Future<void> _onUploadToGoogleSheets(UploadToGoogleSheets event, Emitter<TextRecognitionState> emit) async {
+>>>>>>> b5962d1ba88232bdd366b8c5768e2d30f7f7a26b:lib/bloc/text_bloc/text_recognition_bloc.dart
     emit(state.copyWith(isLoading: true, error: null));
 
     try {
@@ -240,9 +290,22 @@ class TextRecognitionBloc
       extractedData: {},
     ));
   }
+<<<<<<< HEAD:lib/bloc/text_recognition_bloc.dart
 
   void _onSwitchToSheet2(
       SwitchToSheet2 event, Emitter<TextRecognitionState> emit) {
+=======
+void _onUpdateTextFieldQrValue(UpdateTextFieldQrValue event, Emitter<TextRecognitionState> emit) {
+  event.qrData.forEach((key, value) {
+    controllers[key]?.text = value;
+  });
+  emit(state.copyWith(
+    extractedData: Map.from(state.extractedData)..addAll(event.qrData),
+    isDataRecognized: true,
+  ));
+}
+  void _onSwitchToSheet2(SwitchToSheet2 event, Emitter<TextRecognitionState> emit) {
+>>>>>>> b5962d1ba88232bdd366b8c5768e2d30f7f7a26b:lib/bloc/text_bloc/text_recognition_bloc.dart
     GoogleSheetsService.switchToSheet2();
     emit(state.copyWith(isSheet2: true));
   }
@@ -277,6 +340,80 @@ class TextRecognitionBloc
     }
   }*/
 
+  Future<void> _onRecognizeQRFromImage(RecognizeQRFromImage event, Emitter<TextRecognitionState> emit) async {
+    emit(state.copyWith(isLoading: true, error: null));
+
+    try {
+      print('Resim seçme işlemi başlatılıyor...');
+      final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+      if (pickedFile == null) {
+        print('Resim seçilmedi');
+        emit(state.copyWith(isLoading: false, error: 'Resim seçilmedi'));
+        return;
+      }
+      print('Resim seçildi: ${pickedFile.path}');
+
+      final inputImage = InputImage.fromFilePath(pickedFile.path);
+      print('InputImage oluşturuldu');
+
+      final qrCodeDetector = GoogleMlKit.vision.barcodeScanner();
+      print('QR kod tarayıcı başlatıldı');
+
+      print('QR kod tarama işlemi başlıyor...');
+      final List<Barcode> barcodes = await qrCodeDetector.processImage(inputImage);
+      print('Taranan barkod sayısı: ${barcodes.length}');
+
+      if (barcodes.isNotEmpty) {
+        final qrData = barcodes.first.displayValue ?? '';
+        print('Okunan QR kod verisi: $qrData');
+        final parsedData = _parseQRData(qrData);
+        print('Ayrıştırılmış veri: $parsedData');
+        emit(state.copyWith(
+          isLoading: false,
+          extractedData: parsedData,
+          isDataRecognized: true,
+        ));
+      } else {
+        print('QR kod bulunamadı');
+        emit(state.copyWith(isLoading: false, error: 'QR kod bulunamadı'));
+      }
+
+      await qrCodeDetector.close();
+    } catch (e) {
+      print('QR kod okuma hatası: $e');
+      emit(state.copyWith(isLoading: false, error: 'QR kod okuma hatası: $e'));
+    }
+  }
+
+  Map<String, String> _parseQRData(String data) {
+    final extractedData = <String, String>{
+      'EBAT': '',
+      'KALITE': '',
+      'DOKUM': '',
+      'AGIRLIK': '',
+      'PAKET': '',
+    };
+
+    final parts = data.split(';');
+    for (var part in parts) {
+      part = part.trim();
+      if (part.startsWith('Ø')) {
+        extractedData['EBAT'] = part;
+      } else if (part.startsWith('SAE')) {
+        extractedData['KALITE'] = part;
+      } else if (RegExp(r'^\d{6}$').hasMatch(part)) {
+        extractedData['DOKUM'] = part;
+      } else if (RegExp(r'^\d{4}$').hasMatch(part)) {
+        extractedData['AGIRLIK'] = part;
+      } else if (RegExp(r'^\d{8}$').hasMatch(part)) {
+        extractedData['PAKET'] = part;
+      }
+    }
+
+    print('Ayrıştırılmış veri: $extractedData'); // Hata ayıklama için
+
+    return extractedData;
+  }
   @override
   Future<void> close() {
     textRecognizer.close();

@@ -118,7 +118,12 @@ class GoogleSheetsService {
       return null;
     }
 
+<<<<<<< HEAD
   }*/
+=======
+  }
+
+>>>>>>> b5962d1ba88232bdd366b8c5768e2d30f7f7a26b
   static Future<void> insertData(Map<String, String> data, int selectedNumber) async {
     if (_currentWorksheet == null) {
       print('No worksheet selected');

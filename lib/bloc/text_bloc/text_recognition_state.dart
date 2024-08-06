@@ -10,6 +10,8 @@ class TextRecognitionState {
   final bool useSheet2;
   final bool isSheet2;
   final bool isSuccess;
+  String? _scannedQRData;
+
 
   final bool isClearingSheets;
 
